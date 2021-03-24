@@ -13,11 +13,16 @@ const signUp = (req, res) => {
         if(err || !user){
             delete req.body.isAdmin;
             delete req.body.isVerified;
+            req.body.emailVerifyToken = crypto.randomBytes(20).toString('hex');
             const newUser = new User(req.body);
             newUser.save((error, saved) => {
                 if(error) return res.status(403).json({error})
                 else if(saved) {
-                    return res.status(200).json({ message : "Sign up successful. Please login" });
+                    sendVerifyMail(saved.email, saved.emailVerifyToken);
+                    const token = jwt.sign({_id: saved._id}, process.env.JWT_SECRET);
+                    //return response with user and token to frontend client
+                    const { _id, name, email, isVerified } = saved;
+                    return res.status(200).json({ message : "Sign up successful. Please check your mail box for verification link", token, user : {_id, email, name, isVerified} });
                 }
             })
         }
