@@ -144,7 +144,7 @@ const forgotPassword = (req, res) => {
             if(err) res.status(400).json({error : 'An error occured, please try again'});
             sendMail(user.email, user.resetPasswordToken)
             .then(info => {
-                res.json({user, message : 'Password reset link has been sent successfully'})
+                res.json({message : 'Password reset link has been sent successfully'})
             })
             .catch(err => res.status(400).json({error : err}))
         })
