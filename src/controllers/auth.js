@@ -18,7 +18,7 @@ const signUp = (req, res) => {
             newUser.save((error, saved) => {
                 if(error) return res.status(403).json({error})
                 else if(saved) {
-                    sendVerifyMail(saved.email, saved.emailVerifyToken);
+                    sendVerifyMail(saved.email, saved.emailVerifyToken, saved.name.split(' ')[0]);
                     const token = jwt.sign({_id: saved._id}, process.env.JWT_SECRET);
                     //return response with user and token to frontend client
                     const { _id, name, email, isVerified } = saved;
