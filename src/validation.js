@@ -1,6 +1,6 @@
 const validate = (req, res, next) => {
     let error = '';
-    if(req.body.name.trim() === '' || req.body.email.trim() === '' || req.body.password.trim() === '') {
+    if(!req.body.name || !req.body.password || !req.body.email || req.body.name.trim() === '' || req.body.email.trim() === '' || req.body.password.trim() === '') {
         error = 'All fields are required';
         res.status(400).json({error});
         return;
