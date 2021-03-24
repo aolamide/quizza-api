@@ -9,6 +9,7 @@ dotenv.config();
 
 const quizControllers = {
     createQuiz(req, res) {
+        if(!req.profile.isVerified) return res.status(400).json({ error : 'Please verify your email first' });
         if(req.body.questions.length < 5) return res.status(500).json({error : 'Minimum of five questions is required'})
         const newQuiz = new Quiz(req.body);
         newQuiz.save((err, result) => {
