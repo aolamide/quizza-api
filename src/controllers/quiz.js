@@ -49,7 +49,7 @@ const quizControllers = {
         try {
             const count = await Quiz.countDocuments();
             const [skip, pages, limit] = paginationParams(count, +req.query.limit || 10, req.query.page || 1);
-            const quizzes = await Quiz.find().sort('-created').select('-questions -takenBy').skip(skip).limit(limit).populate('creator', 'name email');
+            const quizzes = await Quiz.find().sort('-created').skip(skip).limit(limit).populate('creator', 'name email');
             return res.json(quizzes);
         } catch (error) {
             return res.json({ error : error.message })
