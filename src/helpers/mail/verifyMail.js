@@ -5,7 +5,7 @@ dotenv.config()
 sgMail.setApiKey(process.env.SG_KEY);
 
 const sendVerifyMail = (email, token, name) => {
-  const link = `https://quizza.live/verify?token=${token}&email=${email}`;
+  const link = `https://quizza.live/verify/${token}/${email}`;
   const mailOptions = {
       from: `Quizza <noreply@quizza.live>`,
       to: email,
