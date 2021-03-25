@@ -103,7 +103,8 @@ const tokenValid = (err, req, res, next) => {
 const requireSignIn = expressJwt({
     //if token is valid, express jwt appends the verified users id in an auth key to the request object
     secret : process.env.JWT_SECRET,
-    userProperty : "auth"
+    userProperty : "auth",
+    algorithms: ['RS256']
 });
 
 const isAdmin = (req, res, next) => {
