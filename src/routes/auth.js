@@ -6,12 +6,12 @@ const router = express.Router();
 router.post('/register', validate, signUp );
 router.post('/login', signIn);
 router.post('/admin/login', adminSignIn);
-router.post('/sendVerify', requireSignIn, tokenValid, sendVerificationMail);
+router.post('/sendVerify', requireSignIn , sendVerificationMail);
 router.put('/verify', confirmVerification);
 router.post('/forgotPassword', forgotPassword);
 router.get('/reset', confirmResetLink);
 router.put('/updatePassword', updatePassword);
-router.get('/users', requireSignIn, tokenValid, isAdmin, getAllUsers);
+router.get('/users', requireSignIn, isAdmin, getAllUsers);
 
 
 

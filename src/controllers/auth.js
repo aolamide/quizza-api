@@ -100,12 +100,24 @@ const tokenValid = (err, req, res, next) => {
     }
     next();
 }
-const requireSignIn = expressJwt({
-    //if token is valid, express jwt appends the verified users id in an auth key to the request object
-    secret : process.env.JWT_SECRET,
-    userProperty : "auth",
-    algorithms: ['RS256']
-});
+// const requireSignIn = expressJwt({
+//     //if token is valid, express jwt appends the verified users id in an auth key to the request object
+//     secret : process.env.JWT_SECRET,
+//     userProperty : "auth",
+//     algorithms: ['RS256']
+// });
+
+const requireSignIn = (req, res, next) => {
+    const token = req.headers.authorization?.split(' ')[1];
+    if(!token) {
+        return res.status(401).json({error :'Authorization error occured, please relogin and retry'});
+    }
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+        if(err) return res.status(401).json({error :'Authorization error occured, please relogin and retry'});
+        req.auth = decoded;
+        next()
+    })
+}
 
 const isAdmin = (req, res, next) => {
     if(!req.auth.isAdmin) return res.json({"error" : 'Back off, admin route'});
