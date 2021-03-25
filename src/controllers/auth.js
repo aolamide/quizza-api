@@ -88,8 +88,8 @@ const adminSignIn = (req, res) => {
         const token = jwt.sign({_id: user._id, isAdmin : user.isAdmin}, process.env.JWT_SECRET);
     
         //return response with user and token to frontend client
-        const { _id, name, email, isAdmin } = user;
-        return res.json({token, user : {_id, email, name, isAdmin}});
+        const { _id, name, email, isAdmin, isVerified } = user;
+        return res.json({token, user : {_id, email, name, isAdmin, isVerified}});
     })
     
 }
@@ -187,7 +187,7 @@ const sendVerificationMail = async (req, res) => {
             user.emailVerifyToken = token; 
         } else {
             //if mail was sent within last 10 minutes, do not resend
-            if((Date.now() - user.verifySent) < 1000 * 60 * 10) throw new Error('Please wait ten minutes before resending a verification mail.');
+            if((Date.now() - user.verifySent) < 1000 * 60 * 5) throw new Error('Please wait five minutes before resending a verification mail.');
             token = user.emailVerifyToken; 
         }
         user.verifySent = Date.now();
@@ -196,7 +196,7 @@ const sendVerificationMail = async (req, res) => {
         .catch(err => {
             return res.status(500).json({ error : 'Error occured while sending mail'})
         })
-        return res.json({ message : 'Verification mail sent to ' + user.email});
+        return res.json({ message : 'Verification mail successfully sent to ' + user.email});
     } catch (error) {
         return res.status(400).json({ error : error.message })
     }
