@@ -5,6 +5,7 @@ WORKDIR /usr/src/app
 COPY package.json yarn.lock ./
 
 RUN yarn install --production
+RUN yarn global add @nestjs/cli@11.0.0
 
 COPY . .
 
