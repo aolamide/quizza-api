@@ -1,0 +1,16 @@
+FROM node:23-alpine
+
+WORKDIR /usr/src/app
+
+# Copy package files and install dependencies
+COPY package.json yarn.lock ./
+
+RUN yarn
+
+# Copy the entire source code
+COPY . .
+
+EXPOSE 3000
+
+# Use nodemon to watch for file changes
+CMD ["yarn", "start:dev"]
