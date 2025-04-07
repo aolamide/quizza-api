@@ -3,7 +3,7 @@ dotenv.config();
 
 export const config = {
   web: {
-    port: process.env.APP_PORT,
+    port: process.env.PORT,
   },
   database: {
     host: process.env.DATABASE_HOST as string,
