@@ -11,7 +11,7 @@ export const dataSourceOptions: DataSourceOptions = {
   migrations: ['src/db/migrations/*.ts'],
   synchronize: false,
 };
-
+console.log(dataSourceOptions);
 const dataSource = new DataSource(dataSourceOptions);
 
 export default dataSource;
