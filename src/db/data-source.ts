@@ -7,9 +7,8 @@ export const dataSourceOptions: DataSourceOptions = {
   username: config.database.user,
   password: config.database.password,
   database: config.database.database,
-  entities: ['src/**/*.entity.ts'],
-  migrations: ['src/db/migrations/*.ts'],
-  synchronize: false,
+  entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+  migrations: [__dirname + '/migrations/*{.ts,.js}'],
 };
 
 const dataSource = new DataSource(dataSourceOptions);
