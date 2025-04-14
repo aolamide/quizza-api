@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { UserService } from '../user/user.service';
-import { hashPassword } from '../../utils/password.util';
+import { hashPassword } from '../../common/utils/password.util';
 
 @Injectable()
 export class AuthService {
@@ -12,7 +12,7 @@ export class AuthService {
       createUserDto.email,
     );
     if (existingUser) {
-      throw new Error('User already exists');
+      throw new ConflictException('User already exists.');
     }
 
     const hashedPassword = await hashPassword(createUserDto.password);

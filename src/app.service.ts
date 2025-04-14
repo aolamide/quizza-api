@@ -1,8 +1,4 @@
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class AppService {
-  getWelcome(): string {
-    return 'Welcome to Quizza API v2!';
-  }
-}
+export class AppService {}

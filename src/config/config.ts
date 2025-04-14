@@ -13,5 +13,3 @@ export const config = {
     database: process.env.DATABASE_NAME as string,
   },
 };
-
-console.log(config);
