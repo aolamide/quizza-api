@@ -1,11 +1,17 @@
 import { ConflictException, Injectable } from '@nestjs/common';
+import { randomBytes } from 'crypto';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { UserService } from '../user/user.service';
 import { hashPassword } from '../../common/utils/password.util';
+import { NotificationService } from '../notification/notification.service';
+import { config } from '../../config/config';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly notificationService: NotificationService,
+  ) {}
 
   async registerUser(createUserDto: CreateUserDto) {
     const existingUser = await this.userService.findByEmail(
@@ -16,10 +22,23 @@ export class AuthService {
     }
 
     const hashedPassword = await hashPassword(createUserDto.password);
+    // Generate email verification token
+    const emailVerificationToken = randomBytes(20).toString('hex');
 
-    return await this.userService.createUser({
+    const data = await this.userService.createUser({
       ...createUserDto,
       password: hashedPassword,
+      emailVerifyToken: emailVerificationToken,
+      emailVerifySentAt: new Date(),
     });
+
+    // Send verification email
+    await this.notificationService.sendEmail(
+      createUserDto.email,
+      config.notification.email.templates.emailVerification,
+      { name: createUserDto.name, token: emailVerificationToken },
+    );
+
+    return data;
   }
 }

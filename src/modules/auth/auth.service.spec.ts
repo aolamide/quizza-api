@@ -5,6 +5,7 @@ import { UserService } from '../user/user.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { ConflictException } from '@nestjs/common';
 import * as passwordUtils from '../../common/utils/password.util';
+import { NotificationService } from '../notification/notification.service';
 
 jest.mock('../../common/utils/password.util');
 
@@ -24,6 +25,12 @@ describe('AuthService', () => {
         {
           provide: UserService,
           useValue: mockUserService,
+        },
+        {
+          provide: NotificationService,
+          useValue: {
+            sendEmail: jest.fn().mockResolvedValue(true),
+          },
         },
       ],
     }).compile();
@@ -69,10 +76,17 @@ describe('AuthService', () => {
       expect(passwordUtils.hashPassword).toHaveBeenCalledWith(
         createUserDto.password,
       );
-      expect(userService.createUser).toHaveBeenCalledWith({
-        ...createUserDto,
-        password: 'hashedPassword',
-      });
+      expect(userService.createUser).toHaveBeenCalledWith(
+        expect.objectContaining({
+          email: createUserDto.email,
+          name: createUserDto.name,
+          password: 'hashedPassword',
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          emailVerifyToken: expect.stringMatching(/^[a-f0-9]{40}$/),
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          emailVerifySentAt: expect.any(Date),
+        }),
+      );
       expect(result).toEqual(createdUser);
     });
 

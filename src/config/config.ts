@@ -12,4 +12,14 @@ export const config = {
     password: process.env.DATABASE_PASSWORD as string,
     database: process.env.DATABASE_NAME as string,
   },
+  notification: {
+    email: {
+      apiKey: process.env.SENDGRID_API_KEY as string,
+      sender: process.env.EMAIL_SENDER as string,
+      templates: {
+        emailVerification: process.env
+          .EMAIL_VERIFICATION_TEMPLATE_NAME as string,
+      },
+    },
+  },
 };
