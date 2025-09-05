@@ -3,6 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
+import { VerifyUserDto } from './dto/verify-user.dto';
 import * as responseUtil from '../../common/utils/response.util';
 
 describe('AuthController', () => {
@@ -11,6 +12,7 @@ describe('AuthController', () => {
 
   const mockAuthService = {
     registerUser: jest.fn(),
+    verifyEmail: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -89,6 +91,44 @@ describe('AuthController', () => {
       );
 
       expect(authService.registerUser).toHaveBeenCalledWith(createUserDto);
+    });
+  });
+
+  describe('verifyEmail', () => {
+    it('should verify email and return success response', async () => {
+      const verifyUserDto: VerifyUserDto = {
+        token: 'valid-token-123',
+      };
+
+      mockAuthService.verifyEmail.mockResolvedValue(undefined);
+
+      const result = await controller.verifyEmail(verifyUserDto);
+
+      expect(authService.verifyEmail).toHaveBeenCalledWith(verifyUserDto.token);
+
+      expect(responseUtil.sendSuccess).toHaveBeenCalledWith(
+        null,
+        'Email verified successfully.',
+      );
+
+      expect(result).toHaveProperty('status', 'success');
+      expect(result).toHaveProperty('data', null);
+      expect(result).toHaveProperty('message', 'Email verified successfully.');
+    });
+
+    it('should propagate errors from authService', async () => {
+      const verifyUserDto: VerifyUserDto = {
+        token: 'invalid-token',
+      };
+      const error = new Error('Invalid or expired verification token.');
+
+      mockAuthService.verifyEmail.mockRejectedValue(error);
+
+      await expect(controller.verifyEmail(verifyUserDto)).rejects.toThrow(
+        error,
+      );
+
+      expect(authService.verifyEmail).toHaveBeenCalledWith(verifyUserDto.token);
     });
   });
 });
