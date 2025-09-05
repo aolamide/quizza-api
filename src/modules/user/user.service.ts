@@ -18,4 +18,14 @@ export class UserService {
       where: { email },
     });
   }
+
+  async findByEmailVerifyToken(token: string): Promise<User | null> {
+    return await this.userRepository.findOne({
+      where: { emailVerifyToken: token },
+    });
+  }
+
+  async updateUser(id: number, updateData: Partial<User>): Promise<void> {
+    await this.userRepository.update(id, updateData);
+  }
 }

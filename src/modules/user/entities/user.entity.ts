@@ -27,10 +27,10 @@ export class User {
   resetPasswordExpires: Date;
 
   @Column({ type: 'char', length: 40, unique: true, nullable: true })
-  emailVerifyToken: string;
+  emailVerifyToken: string | null;
 
   @Column({ nullable: true, type: 'timestamp' })
-  emailVerifySentAt: Date;
+  emailVerifySentAt: Date | null;
 
   @Column({ default: false })
   isVerified: boolean;

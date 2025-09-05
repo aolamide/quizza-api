@@ -1,4 +1,8 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+} from '@nestjs/common';
 import { randomBytes } from 'crypto';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { UserService } from '../user/user.service';
@@ -33,12 +37,25 @@ export class AuthService {
     });
 
     // Send verification email
-    await this.notificationService.sendEmail(
+    void this.notificationService.sendEmail(
       createUserDto.email,
       config.notification.email.templates.emailVerification,
       { name: createUserDto.name, token: emailVerificationToken },
     );
 
     return data;
+  }
+
+  async verifyEmail(token: string) {
+    const user = await this.userService.findByEmailVerifyToken(token);
+    if (!user) {
+      throw new BadRequestException('Invalid or expired verification token.');
+    }
+
+    await this.userService.updateUser(user.id, {
+      isVerified: true,
+      emailVerifyToken: null,
+      emailVerifySentAt: null,
+    });
   }
 }

@@ -3,7 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
 import { UserService } from '../user/user.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
-import { ConflictException } from '@nestjs/common';
+import { BadRequestException, ConflictException } from '@nestjs/common';
 import * as passwordUtils from '../../common/utils/password.util';
 import { NotificationService } from '../notification/notification.service';
 
@@ -16,6 +16,8 @@ describe('AuthService', () => {
   const mockUserService = {
     findByEmail: jest.fn(),
     createUser: jest.fn(),
+    findByEmailVerifyToken: jest.fn(),
+    updateUser: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -99,6 +101,55 @@ describe('AuthService', () => {
 
       expect(userService.findByEmail).toHaveBeenCalledWith(createUserDto.email);
       expect(userService.createUser).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('verifyEmail', () => {
+    const mockToken = 'valid-token-123';
+    const mockUser = {
+      id: 1,
+      email: 'test@example.com',
+      name: 'Test User',
+      isVerified: false,
+      emailVerifyToken: mockToken,
+      emailVerifySentAt: new Date(),
+    };
+
+    beforeEach(() => {
+      mockUserService.findByEmailVerifyToken = jest.fn();
+      mockUserService.updateUser = jest.fn();
+    });
+
+    it('should verify email successfully when token is valid', async () => {
+      mockUserService.findByEmailVerifyToken.mockResolvedValue(mockUser);
+      mockUserService.updateUser.mockResolvedValue(undefined);
+
+      await service.verifyEmail(mockToken);
+
+      expect(userService.findByEmailVerifyToken).toHaveBeenCalledWith(
+        mockToken,
+      );
+      expect(userService.updateUser).toHaveBeenCalledWith(mockUser.id, {
+        isVerified: true,
+        emailVerifyToken: null,
+        emailVerifySentAt: null,
+      });
+    });
+
+    it('should throw ConflictException when token is invalid or expired', async () => {
+      mockUserService.findByEmailVerifyToken.mockResolvedValue(null);
+
+      await expect(service.verifyEmail(mockToken)).rejects.toThrow(
+        BadRequestException,
+      );
+      await expect(service.verifyEmail(mockToken)).rejects.toThrow(
+        'Invalid or expired verification token.',
+      );
+
+      expect(userService.findByEmailVerifyToken).toHaveBeenCalledWith(
+        mockToken,
+      );
+      expect(userService.updateUser).not.toHaveBeenCalled();
     });
   });
 });
